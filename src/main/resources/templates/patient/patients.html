@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header.html :: header}"></head>
+
+<body class="d-flex flex-column h-100 color_sub_bg">
+<div th:replace="~{fragments/menu.html :: menu(header='Search Patient')}"></div>
+
+<script>
+    $(document).ready(function () {
+        $('.delete').on('click', function (event) {
+            event.preventDefault();
+            let url = $(this).attr('href');
+            deletePatient(url);
+        });
+
+        function deletePatient(url) {
+            Swal.fire({
+                title: "",
+                text: 'Are you sure you would like to delete the selected patient?',
+                icon: "warning",
+                showCancelButton: true
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    notice.showLoading({
+                        type: 'dots',  // default：'line'
+                        color: '#ffffff',
+                        backgroundColor: 'rgba(0,0,0,.7)',
+                        title: 'Deleting...',
+                        fontSize: 20,
+                    });
+                    $.ajax({
+                        url: url,
+                        method: 'get',
+                        contentType: "application/json",
+                        statusCode: {
+                            200: function (xhr) {
+                                notice.hideLoading();
+                                Swal.fire({
+                                    title: "Patient has been deleted.",
+                                    text: "",
+                                    icon: "success",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = '/patient/patients.html';
+                                });
+                            },
+                            400: function (xhr) {
+                                notice.hideLoading();
+                                Swal.fire({
+                                    title: "",
+                                    text: xhr.responseText,
+                                    icon: "error",
+                                });
+                            },
+                            500: function (xhr) {
+                                notice.hideLoading();
+                                Swal.fire({
+                                    title: "",
+                                    text: xhr.responseText,
+                                    icon: "error",
+                                });
+                            }
+                        }
+                    });
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({
+                        title: "Cancelled",
+                        text: "",
+                        icon: "error",
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                }
+            });
+        }
+    })
+
+    $(function () {
+        $('#patientName').select2({
+            width: '100%',
+            theme: "bootstrap-5",
+            allowClear: true,
+            searchInputPlaceholder: 'Search Patient...',
+            placeholder: ''
+        })
+    });
+</script>
+
+<main class="flex-shrink-0">
+    <div class="container-fluid">
+        <div class="row mt-2">
+            <form th:action="@{/patient/patients.html}" th:object="${command}" action="#"
+                  method="post">
+                <div class="card color_bg mb-2">
+                    <div class="card-header color_headline color_bg initialism">
+                        Search Patients
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <label class="col-3 col-lg-4 col-md-3 col-form-label text-md-end color_headline text_right">
+                                Name:
+                            </label>
+                            <div class="col-9 col-lg-4 col-md-6">
+                                <select th:field="*{names}" id="patientName" name="patientName"
+                                        class="form-select color_bg color_headline">
+                                    <option value=""></option>
+                                    <option th:each="name : ${names}"
+                                            th:value="${name}"
+                                            th:text="${name}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="offset-lg-4 offset-md-3 col-12 col-lg-4 col-md-6">
+                                <input class="btn mb-2 color_button" value="Search" type="submit">
+                                <input class="btn mb-2 color_button" value="Clear Form" type="submit"
+                                       onclick="clearFormVisible(this.form);">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card color_bg my-4">
+            <div class="card-header color_headline color_bg initialism">
+                Patients
+            </div>
+            <div class="card-body">
+                <div class="row btn-toolbar-bg">
+                    <div class="col-md-12">
+                        <div class="btn-toolbar">
+                            <div class="btn-group mb-2">
+                                <a class="btn add_field color_tertiary"
+                                   th:href="@{/patient/patientEdit.html}"
+                                   title="Create Patient">
+                                    <i class="fal fa-plus" aria-hidden="true"></i> Add New
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="toolbarForm" action="" method="post">
+                    <div class="table-responsive">
+                        <table id="row" class="table table-hover align-middle text-nowrap">
+                            <thead>
+                            <tr>
+                                <th class="data-table-header" style="width:50px;">#</th>
+                                <th class="data-table-header text-center" style="width:150px;">Actions</th>
+                                <th class="data-table-header">Name</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="patient, status : ${list} ">
+                                <td th:text="${status.index + 1}"></td>
+                                <td class="text-center">
+                                    <a rel="patientEdit"
+                                       href="#"
+                                       th:href="@{/patient/patientEdit.html(patientId=${patient.patientId})}"
+                                       title="Edit Patient">
+                                        <i class="table_icon fa-solid fa-pen" aria-hidden="true"></i>
+                                    </a>
+                                    <a class="delete"
+                                       rel="patientDelete"
+                                       href="#"
+                                       th:href="@{/patient/patientDelete.html(patientIds=${patient.patientId})}"
+                                       title="Delete Patient">
+                                        <i class="table_icon fa-solid fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                </td>
+                                <td th:text="${patient.name}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer mt-auto py-3">
+    <footer th:replace="~{fragments/footer.html :: footer}"></footer>
+</footer>
+
+<script th:replace="~{fragments/scripts.html :: scripts}"></script>
+</body>
+</html>

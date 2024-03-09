@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header.html :: header}"></head>
+
+<style>
+    .card {
+        border-color: #ececec;
+    }
+
+    .card-header {
+        padding: 12px;
+        font-weight: 600;
+        background-color: #fff;
+        border-bottom: 1px solid #ececec;
+    }
+
+    .btn {
+        width: 130px;
+    }
+
+    .body {
+        min-height: 99%;
+    }
+
+    .data-table-header {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    .table_icon {
+        color: var(--bs-gray-900);
+        border: var(--bs-border-width) solid var(--bs-gray-300);
+        padding: 0.315rem;
+        border-radius: var(--bs-border-radius);
+        vertical-align: middle;
+        font-size: 1rem;
+        background-color: var(--bs-white);
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    .table {
+        width: 100%;
+        text-align: left;
+        border-color: var(--bs-table-border-color);
+    }
+
+    .table > thead {
+        vertical-align: bottom;
+        border-bottom: 2px solid #e9ebec;
+        border-top: 2px solid #e9ebec;
+        margin-top: 10px;
+    }
+
+    td {
+        min-width: auto;
+    }
+
+    .main {
+        padding: 0;
+    }
+
+    form {
+        margin: 0;
+    }
+
+    .trash_alt {
+        font-size: 18px;
+        color: #ced4da;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $('#save').on('click', function () {
+            notice.showLoading({
+                type: 'dots',  // default：'line'
+                color: '#ffffff',
+                backgroundColor: 'rgba(0,0,0,.7)',
+                title: 'Saving...',
+                fontSize: 20,
+            });
+
+            $.ajax({
+                url: '/disease/diseaseEdit.html',
+                type: "post",
+                data: $('#disease').serialize(),
+                statusCode: {
+                    200: function (xhr) {
+                        notice.hideLoading();
+                        Swal.fire({
+                            title: "",
+                            text: "Disease has been saved",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(function () {
+                            window.location.href = '/disease/diseases.html';
+                        });
+                    },
+                    400: function (xhr) {
+                        notice.hideLoading();
+                        Swal.fire({
+                            title: "",
+                            text: xhr.responseText,
+                            icon: "error",
+                        });
+                    },
+                    500: function (xhr) {
+                        notice.hideLoading();
+                        Swal.fire({
+                            title: "",
+                            text: xhr.responseText,
+                            icon: "error",
+                        });
+                    }
+                },
+            });
+        });
+    })
+</script>
+<body class="d-flex flex-column h-100 color_sub_bg">
+<div th:replace="~{fragments/menu.html :: menu(header='Disease Edit')}"></div>
+
+<main class="flex-shrink-0">
+    <div class="container-fluid">
+        <div class="row mt-2">
+            <form id="disease" th:action="@{/disease/diseaseEdit.html}" th:object="${disease}"
+                  action="#"
+                  method="post">
+                <input type="hidden" th:field="${disease.diseaseId}">
+                <div class="card color_bg mb-2">
+                    <div class="card-header color_headline color_bg initialism">
+                        Edit Disease
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <label class="col-3 col-lg-4 col-md-3 col-form-label text-md-end color_headline text_right">
+                                Name:<span class="text-danger">&nbsp;*</span>
+                            </label>
+                            <div class="col-9 col-lg-4 col-md-6">
+                                <input type="text" th:field="${disease.name}"
+                                       class="form-control color_bg color_headline"/>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label class="col-3 col-lg-4 col-md-3 col-form-label text-md-end color_headline text_right">
+                                Patient:<span class="text-danger">&nbsp;*</span>
+                            </label>
+                            <div class="col-9 col-lg-4 col-md-6">
+                                <select th:field="${disease.patient}"
+                                        class="form-select color_bg color_headline">
+                                    <option value=""></option>
+                                    <option th:each="patient : ${patients}"
+                                            th:value="${patient.patientId}"
+                                            th:text="${patient.name}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <input id="save" class="btn color_button" value="Save" type="button">
+                                <input class="btn color_button_outline" value="Cancel" type="submit"
+                                       name="_cancel">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer class="footer mt-auto py-3">
+    <footer th:replace="~{fragments/footer.html :: footer}"></footer>
+</footer>
+
+<script th:replace="~{fragments/scripts.html :: scripts}"></script>
+</body>
+</html>

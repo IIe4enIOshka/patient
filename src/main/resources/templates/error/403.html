@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header.html :: header}"></head>
+
+<body class="align-items-center color_bg">
+<div th:replace="~{fragments/menu.html :: menu(header='Error 403')}"></div>
+<div class="row color_sub_bg m-auto position-relative h-100">
+    <div class="col-12 d-flex flex-column h-100">
+        <div class="row main">
+            <div class="col-12 d-flex flex-column">
+                <div class="row h-100">
+                    <div class="col-12">
+                        <div class="row mt-2 px-2">
+                            You don't have permission to access / on this page.
+                        </div>
+                    </div>
+                </div>
+                <footer th:replace="~{fragments/footer.html :: footer}"></footer>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:replace="~{fragments/scripts.html :: scripts}"></script>
+</body>
+</html>

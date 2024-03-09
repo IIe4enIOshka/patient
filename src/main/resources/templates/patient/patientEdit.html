@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header.html :: header}"></head>
+
+<style>
+    .card {
+        border-color: #ececec;
+    }
+
+    .card-header {
+        padding: 12px;
+        font-weight: 600;
+        background-color: #fff;
+        border-bottom: 1px solid #ececec;
+    }
+
+    .btn {
+        width: 130px;
+    }
+
+    .body {
+        min-height: 99%;
+    }
+
+    .data-table-header {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    .table_icon {
+        color: var(--bs-gray-900);
+        border: var(--bs-border-width) solid var(--bs-gray-300);
+        padding: 0.315rem;
+        border-radius: var(--bs-border-radius);
+        vertical-align: middle;
+        font-size: 1rem;
+        background-color: var(--bs-white);
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    .table {
+        width: 100%;
+        text-align: left;
+        border-color: var(--bs-table-border-color);
+    }
+
+    .table > thead {
+        vertical-align: bottom;
+        border-bottom: 2px solid #e9ebec;
+        border-top: 2px solid #e9ebec;
+        margin-top: 10px;
+    }
+
+    td {
+        min-width: auto;
+    }
+
+    .main {
+        padding: 0;
+    }
+
+    form {
+        margin: 0;
+    }
+
+    .trash_alt {
+        font-size: 18px;
+        color: #ced4da;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<script>
+    function deleteDisease(diseaseId) {
+        let url = "/patient/removeDiseasePatient";
+        let formData = $('#patient').serializeArray();
+        let param = {};
+
+        param["name"] = "diseaseId";
+        param["value"] = diseaseId;
+
+        formData.push(param);
+
+        Swal.fire({
+            title: "",
+            text: 'Are you sure you would like to delete the selected disease?',
+            icon: "warning",
+            showCancelButton: true
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                $('#diseases').load(url, formData);
+                Swal.fire({
+                    title: "Disease has been deleted.",
+                    text: "",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire({
+                    title: "Cancelled",
+                    text: "",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+            }
+        });
+    }
+
+    function addDisease() {
+        let url = "/patient/addDiseasePatient";
+        let formData = $('#patient').serializeArray();
+        $('#diseases').load(url, formData);
+    }
+
+    $(document).ready(function () {
+        $('#save').on('click', function () {
+            notice.showLoading({
+                type: 'dots',  // default：'line'
+                color: '#ffffff',
+                backgroundColor: 'rgba(0,0,0,.7)',
+                title: 'Saving...',
+                fontSize: 20,
+            });
+
+            $.ajax({
+                url: '/patient/patientEdit.html',
+                type: "post",
+                data: $('#patient').serialize(),
+                statusCode: {
+                    200: function (xhr) {
+                        notice.hideLoading();
+                        Swal.fire({
+                            title: "",
+                            text: "Patient has been saved",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(function () {
+                            window.location.href = '/patient/patients.html';
+                        });
+                    },
+                    400: function (xhr) {
+                        notice.hideLoading();
+                        Swal.fire({
+                            title: "",
+                            text: xhr.responseText,
+                            icon: "error",
+                        });
+                    },
+                    500: function (xhr) {
+                        notice.hideLoading();
+                        Swal.fire({
+                            title: "",
+                            text: xhr.responseText,
+                            icon: "error",
+                        });
+                    }
+                },
+            });
+        });
+    })
+</script>
+<body class="d-flex flex-column h-100 color_sub_bg">
+<div th:replace="~{fragments/menu.html :: menu(header='Patient Edit')}"></div>
+
+<main class="flex-shrink-0">
+    <div class="container-fluid">
+        <div class="row mt-2">
+            <form id="patient" th:action="@{/patient/patientEdit.html}" th:object="${patient}"
+                  action="#"
+                  method="post">
+                <input type="hidden" th:field="${patient.patientId}">
+                <div class="card color_bg mb-2">
+                    <div class="card-header color_headline color_bg initialism">
+                        Edit Patient
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <label class="col-3 col-lg-4 col-md-3 col-form-label text-md-end color_headline text_right">
+                                Name:<span class="text-danger">&nbsp;*</span>
+                            </label>
+                            <div class="col-9 col-lg-4 col-md-6">
+                                <input type="text" th:field="${patient.name}"
+                                       class="form-control color_bg color_headline"/>
+                            </div>
+                        </div>
+                        <div class="card color_bg mb-3">
+                            <div class="card-header color_headline color_bg initialism">Diseases</div>
+                            <div class="card-body" id="diseases">
+                                <div class="col-12">
+                                    <div class="card color_bg" th:fragment="diseaseList">
+                                        <div class="card-header color_headline color_bg initialism">
+                                            <input class="btn color_tertiary float-end"
+                                                   value="Add Disease"
+                                                   type="button"
+                                                   th:onclick="'addDisease(' + ${patient.patientId} + ')'">
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row mb-2"
+                                                 th:each="disease, stat : ${patient.diseases}">
+                                                <input type="hidden"
+                                                       th:field="${patient.diseases[__${stat.index}__].diseaseId}">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           th:field="${patient.diseases[__${stat.index}__].name}"
+                                                           class="form-control color_bg color_headline">
+                                                    <span class="input-group-text">
+                                                        <div class="trash_alt"
+                                                             th:onclick="'deleteDisease(' + ${stat.index} + ')'">
+                                                            <i class="bx bx-trash-alt"></i>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <input id="save" class="btn color_button" value="Save" type="button">
+                                <input class="btn color_button_outline" value="Cancel" type="submit"
+                                       name="_cancel">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer class="footer mt-auto py-3">
+    <footer th:replace="~{fragments/footer.html :: footer}"></footer>
+</footer>
+
+<script th:replace="~{fragments/scripts.html :: scripts}"></script>
+</body>
+</html>

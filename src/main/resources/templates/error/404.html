@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header.html :: header}"></head>
+
+<body class="align-items-center color_bg">
+<div th:replace="~{fragments/menu.html :: menu(header='Error 404')}"></div>
+<div class="row color_sub_bg m-auto position-relative h-100">
+    <div class="col-12 d-flex flex-column h-100">
+        <div class="row main">
+            <div class="col-12 d-flex flex-column">
+                <div class="row h-100">
+                    <div class="col-12">
+                        <div class="row mt-2 px-2">
+                            <h3><span class="label label-default">Resource Not Found</span></h3>
+                            <p>Requested resource was not found. Please contact the administrator.</p>
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <td>Timestamp</td>
+                                    <td th:text="${timestamp}">Timestamp</td>
+                                </tr>
+                                <tr>
+                                    <td>Path</td>
+                                    <td th:text="${path}">Path</td>
+                                </tr>
+                                <tr>
+                                    <td>Status</td>
+                                    <td th:text="${status}">Status</td>
+                                </tr>
+                                <tr>
+                                    <td>Error</td>
+                                    <td th:text="${error}">Error</td>
+                                </tr>
+                                <tr>
+                                    <td>Message</td>
+                                    <td th:text="${message}">Message</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <footer th:replace="~{fragments/footer.html :: footer}"></footer>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:replace="~{fragments/scripts.html :: scripts}"></script>
+</body>
+</html>
