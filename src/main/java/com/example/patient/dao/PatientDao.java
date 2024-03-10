@@ -3,7 +3,6 @@ package com.example.patient.dao;
 import com.example.patient.entity.Patient;
 import com.example.patient.patient.PatientForm;
 import com.example.patient.repository.PatientRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,17 +27,14 @@ public class PatientDao implements IPatientDao {
 
     @Override
     public List<Patient> getPatients(PatientForm form) {
-        String name = null;
-
-        if (form.getNames() != null && form.getNames().size() > 0 && StringUtils.isNotBlank(form.getNames().get(0)))
-            name = form.getNames().get(0);
-
-        return patientRepository.getPatients(name);
+        return patientRepository.getPatients(form.getName());
     }
 
     @Override
-    public void insert(String name) {
-        patientRepository.insertPatient(name);
+    public void insert(Patient patient) {
+        if (patient != null) {
+            patientRepository.insertPatient(patient.getName());
+        }
     }
 
     @Override
@@ -52,8 +48,10 @@ public class PatientDao implements IPatientDao {
     }
 
     @Override
-    public void update(Integer patientId, String name) {
-        patientRepository.update(patientId, name);
+    public void update(Patient patient) {
+        if (patient != null) {
+            patientRepository.update(patient.getPatientId(), patient.getName());
+        }
     }
 
     @Override

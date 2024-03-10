@@ -12,13 +12,13 @@ public interface IPatientDao {
 
     List<Patient> getPatients(PatientForm form);
 
-    void insert(String name);
+    void insert(Patient patient);
 
     Patient findTopByOrderByPatientIdDesc();
 
     Patient findByPatientId(Integer patientId);
 
-    void update(Integer patientId, String name);
+    void update(Patient patient);
 
     void deleteById(Integer patientId);
 

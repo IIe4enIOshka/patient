@@ -28,17 +28,14 @@ public class DiseaseDao implements IDiseaseDao {
 
     @Override
     public List<Disease> getDiseases(DiseaseForm form) {
-        String name = null;
-
-        if (form.getNames() != null && form.getNames().size() > 0 && StringUtils.isNotBlank(form.getNames().get(0)))
-            name = form.getNames().get(0);
-
-        return diseaseRepository.getDisease(name);
+        return diseaseRepository.getDisease(form.getName());
     }
 
     @Override
-    public void insert(String name, Integer patientId) {
-        diseaseRepository.insert(name, patientId);
+    public void insert(Disease disease) {
+        if (disease != null) {
+            diseaseRepository.insert(disease.getName(), disease.getPatientId());
+        }
     }
 
     @Override
@@ -57,8 +54,10 @@ public class DiseaseDao implements IDiseaseDao {
     }
 
     @Override
-    public void update(Integer diseaseId, String name) {
-        diseaseRepository.update(diseaseId, name);
+    public void update(Disease disease) {
+        if (disease != null) {
+            diseaseRepository.update(disease.getDiseaseId(), disease.getName());
+        }
     }
 
     @Override

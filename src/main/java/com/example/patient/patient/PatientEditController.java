@@ -64,16 +64,16 @@ public class PatientEditController {
 
             if (patient.getPatientId() == null) {
 //                patientDao.save(patient);
-                patientDao.insert(patient.getName());
+                patientDao.insert(patient);
                 patient.setPatientId(patientDao.findTopByOrderByPatientIdDesc().getPatientId());
             } else {
-                patientDao.update(patient.getPatientId(), patient.getName());
+                patientDao.update(patient);
             }
 
             diseaseDao.deleteByPatientId(patient.getPatientId());
 
             for (Disease disease : patient.getDiseases()) {
-                diseaseDao.insert(disease.getName(), patient.getPatientId());
+                diseaseDao.insert(disease);
             }
 
             return ResponseEntity.status(HttpStatus.OK).body("Patient has been saved");

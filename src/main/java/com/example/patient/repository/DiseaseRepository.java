@@ -37,7 +37,7 @@ public interface DiseaseRepository extends JpaRepository<Disease, Long> {
 
     Disease findByDiseaseId(Integer diseaseId);
 
-    @Query(value = "SELECT * FROM disease WHERE (name = :name OR :name IS NULL)", nativeQuery = true)
+    @Query(value = "SELECT * FROM disease WHERE (name = :name OR :name IS NULL OR :name = '')", nativeQuery = true)
     List<Disease> getDisease(String name);
 
     @Modifying

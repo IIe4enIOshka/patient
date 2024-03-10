@@ -60,9 +60,9 @@ public class DiseaseEditController {
 
             if (disease.getDiseaseId() == null) {
 //                diseaseDao.save(patient);
-                diseaseDao.insert(disease.getName(), disease.getPatientId());
+                diseaseDao.insert(disease);
             } else {
-                diseaseDao.update(disease.getDiseaseId(), disease.getName());
+                diseaseDao.update(disease);
             }
 
             return ResponseEntity.status(HttpStatus.OK).body("Disease has been saved");

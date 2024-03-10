@@ -37,7 +37,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     Patient findByPatientId(Integer patientId);
 
-    @Query(value = "SELECT * FROM patient WHERE (name = :name OR :name IS NULL)", nativeQuery = true)
+    @Query(value = "SELECT * FROM patient WHERE (name = :name OR :name IS NULL OR :name = '')", nativeQuery = true)
     List<Patient> getPatients(String name);
 
     @Query(value = "SELECT name FROM patient ORDER BY name", nativeQuery = true)

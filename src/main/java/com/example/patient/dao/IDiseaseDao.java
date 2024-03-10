@@ -12,11 +12,11 @@ public interface IDiseaseDao {
 
     List<Disease> getDiseases(DiseaseForm form);
 
-    void insert(String name, Integer patientId);
+    void insert(Disease disease);
 
     Disease findTopByOrderByDiseaseIdDesc();
 
-    void update(Integer diseaseId, String name);
+    void update(Disease disease);
 
     void deleteById(Integer diseaseId);
 
